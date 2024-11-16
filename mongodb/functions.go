@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
@@ -52,7 +53,7 @@ func FindEntityViaEmail(collection *mongo.Collection, emailToFind string) []byte
 }
 func FindEntityViaUuid(collection *mongo.Collection, uuidToFind string) []byte {
 	var result bson.M
-	err := collection.FindOne(context.TODO(), bson.D{{"_id", uuidToFind}}).Decode(&result)
+	err := collection.FindOne(context.TODO(), bson.D{{"_id", primitive.ObjectIDFromHex(uuidToFind)}}).Decode(&result)
 	if errors.Is(err, mongo.ErrNoDocuments) {
 		fmt.Printf("No document was found with the name %s\n", uuidToFind)
 		return nil
