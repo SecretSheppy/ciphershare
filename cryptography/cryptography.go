@@ -11,8 +11,7 @@ import (
 	"log"
 )
 
-func Encrypt(file string) (string, []byte) {
-	value := []byte(file)
+func Encrypt(value []byte) (string, []byte) {
 	keyPhrase := generateKey()
 
 	// Key phrase is hashed for increased security as assumed you are passing it in

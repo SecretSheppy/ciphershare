@@ -3,6 +3,7 @@ package handlers
 import (
 	"fmt"
 	"golang-encrypted-filesharing/cryptography"
+	"golang-encrypted-filesharing/mongodb"
 	"io"
 	"mime/multipart"
 	"net/http"
@@ -45,15 +46,7 @@ func (h *Handlers) UploadFile(w http.ResponseWriter, r *http.Request) {
 	} else {
 		h.log.Info("File has been downloaded")
 	}
-
-	// Encrypt the file
-	key, encryptedFile := cryptography.Encrypt(r.FormValue("fileUpload"))
-
-	// Upload file to folder
-
 	// Upload path to database
-
-	// Upload emails to database
 
 }
 
@@ -70,9 +63,12 @@ func saveFile(file multipart.File, handler *multipart.FileHeader, filename strin
 	}
 	defer tempFile.Close()
 	filebytes, err := io.ReadAll(file)
+
+	key, encryptedFileBytes := cryptography.Encrypt(filebytes)
+
 	if err != nil {
 		return err
 	}
-	tempFile.Write(filebytes)
+	tempFile.Write(encryptedFileBytes)
 	return nil
 }
