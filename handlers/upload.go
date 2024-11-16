@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"fmt"
-	"go.mongodb.org/mongo-driver/mongo"
 	"golang-encrypted-filesharing/cryptography"
 	"golang-encrypted-filesharing/mongodb"
 	"io"
@@ -11,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 )
 
 var (
@@ -41,27 +41,26 @@ func (h *Handlers) UploadFile(w http.ResponseWriter, r *http.Request) {
 	} else {
 		h.log.Info("File is being parsed")
 	}
-	err = saveFile(file, handler, getFileName())
+	key, path, err := saveFile(file, handler, getFileName())
 	if err != nil {
 		h.log.Error(err.Error())
 	} else {
 		h.log.Info("File has been downloaded")
 	}
-	// Upload path to database
-	mongodb.CreateEntity(h.collection, listOfEmails)
 
+	mongodb.CreateEntity(h.collection, strings.Split(r.FormValue("emails"), ","), path, key)
 }
 
 func getFileName() string {
 	return "name"
 }
 
-func saveFile(file multipart.File, handler *multipart.FileHeader, filename string) error {
+func saveFile(file multipart.File, handler *multipart.FileHeader, filename string) (string, string, error) {
 	defer file.Close()
-	folderPath := fmt.Sprintf("%s%s", RootPath, "/files")
+	folderPath := fmt.Sprintf("%s%s", RootPath, "\\files")
 	tempFile, err := os.CreateTemp(folderPath, filename)
 	if err != nil {
-		return err
+		return "", "", err
 	}
 	defer tempFile.Close()
 	filebytes, err := io.ReadAll(file)
@@ -69,8 +68,11 @@ func saveFile(file multipart.File, handler *multipart.FileHeader, filename strin
 	key, encryptedFileBytes := cryptography.Encrypt(filebytes)
 
 	if err != nil {
-		return err
+		return "", "", err
 	}
 	tempFile.Write(encryptedFileBytes)
-	return nil
+
+	fullPath := folderPath + "\\" + filename
+
+	return key, fullPath, nil
 }
