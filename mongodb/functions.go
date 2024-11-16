@@ -50,6 +50,23 @@ func FindEntityViaEmail(collection *mongo.Collection, emailToFind string) []byte
 	fmt.Println(string(jsonData))
 	return jsonData
 }
+func FindEntityViaUuid(collection *mongo.Collection, uuidToFind string) []byte {
+	var result bson.M
+	err := collection.FindOne(context.TODO(), bson.D{{"_id", uuidToFind}}).Decode(&result)
+	if errors.Is(err, mongo.ErrNoDocuments) {
+		fmt.Printf("No document was found with the name %s\n", uuidToFind)
+		return nil
+	}
+	if err != nil {
+		panic(err)
+	}
+	jsonData, err := json.MarshalIndent(result, "", "    ")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(string(jsonData))
+	return jsonData
+}
 func CreateEntity(collection *mongo.Collection, listOfEmails []string, pathToEncryptedFile string, fileKey string) []byte {
 	doc := bson.D{
 		{"list_of_emails", listOfEmails},

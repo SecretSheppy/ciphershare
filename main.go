@@ -5,6 +5,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/lmittmann/tint"
 	"golang-encrypted-filesharing/handlers"
+	"golang-encrypted-filesharing/middleware"
 	"golang-encrypted-filesharing/mongodb"
 	"html/template"
 	"log/slog"
@@ -20,7 +21,8 @@ const (
 )
 
 func main() {
-	coll, client := mongodb.Connect()
+	// the _ is Collection
+	_, client := mongodb.Connect()
 	defer func() {
 		mongodb.Disconnect(client)
 	}()
@@ -37,8 +39,11 @@ func main() {
 	tpl := template.Must(template.New("").ParseGlob("./templates/*.gohtml"))
 
 	h := handlers.NewHandlers(tpl, logger, coll)
+	m := middleware.New(logger)
+
 
 	r := mux.NewRouter()
+	r.Use(m.Logger)
 	r.HandleFunc("/", h.Upload).Methods("GET")
 	r.HandleFunc("/", h.UploadFile).Methods("POST")
 	r.HandleFunc("/download/{key}", h.Download).Methods("GET")
