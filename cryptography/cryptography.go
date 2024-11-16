@@ -11,7 +11,7 @@ import (
 	"log"
 )
 
-func Encrypt(path, file string) (string, []byte) {
+func Encrypt(file string) (string, []byte) {
 	value := []byte(file)
 	keyPhrase := generateKey()
 
@@ -36,9 +36,7 @@ func Encrypt(path, file string) (string, []byte) {
 	// Encrypt
 	cipheredText := gcmInstance.Seal(nonce, nonce, value, nil)
 
-	// Store ciphered text
-
-	// Return the key required to decrypt
+	// Return the key required to decrypt and the cipher text
 	return hashedKey, cipheredText
 }
 
@@ -54,7 +52,7 @@ func generateKey() string {
 	return "placeholder"
 }
 
-func Decrypt(path string, hashedKey string, ciphered []byte) string {
+func Decrypt(hashedKey string, ciphered []byte) string {
 	aesBlock, err := aes.NewCipher([]byte(hashedKey))
 	if err != nil {
 		log.Fatalln(err)
@@ -65,23 +63,12 @@ func Decrypt(path string, hashedKey string, ciphered []byte) string {
 	}
 
 	nonceSize := gcmInstance.NonceSize()
-	// ciphered := []byte(getFileFromPath(path))
-
 	nonce, cipheredText := ciphered[:nonceSize], ciphered[nonceSize:]
-
-	fmt.Println(cipheredText)
 
 	originalText, err := gcmInstance.Open(nil, nonce, cipheredText, nil)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	fmt.Println(string(originalText))
-
 	return string(originalText)
-}
-
-func getFileFromPath(path string) string {
-	// TODO: get file
-	return "Lh\aʀ�D�@�[�d��\"~�ؖQڸ\u0019�啊k!�C|\ta/4�y��.f��/"
 }
