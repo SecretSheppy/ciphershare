@@ -11,6 +11,6 @@ func (h *Handlers) Download(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		h.log.Error(err.Error())
 	} else {
-		h.log.Info("ID" + vars["key"] + "download page accessed")
+		h.log.Info("ID " + vars["key"] + " download page accessed")
 	}
 }
