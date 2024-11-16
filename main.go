@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gorilla/mux"
+	"github.com/joho/godotenv"
 	"github.com/lmittmann/tint"
 	"golang-encrypted-filesharing/handlers"
 	"html/template"
@@ -18,6 +19,11 @@ const (
 )
 
 func main() {
+	if err := godotenv.Load(); err != nil {
+		slog.Error(err.Error())
+		os.Exit(1)
+	}
+
 	logger := slog.New(tint.NewHandler(os.Stdout, nil))
 	logger.Info("Starting encrypted file sharing system...")
 
