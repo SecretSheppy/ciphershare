@@ -1,5 +1,7 @@
-server/ssl/
-.env
+## Directories ##
 .idea/*
-go.sum
+server/ssl/
+
+## Files ##
+.env
 go.sum
