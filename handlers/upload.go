@@ -27,7 +27,7 @@ func (h *Handlers) Upload(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *Handlers) UploadFile(w http.ResponseWriter, r *http.Request, collection mongo.Collection) {
+func (h *Handlers) UploadFile(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseMultipartForm(500 << 20)
 	if err != nil {
 		h.log.Error(err.Error())
@@ -48,7 +48,7 @@ func (h *Handlers) UploadFile(w http.ResponseWriter, r *http.Request, collection
 		h.log.Info("File has been downloaded")
 	}
 	// Upload path to database
-	mongodb.CreateEntity(collection, listOfEmails)
+	mongodb.CreateEntity(h.collection, listOfEmails)
 
 }
 
