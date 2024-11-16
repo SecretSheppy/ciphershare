@@ -5,7 +5,11 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"golang-encrypted-filesharing/cryptography"
+	"golang-encrypted-filesharing/mongodb"
+	"io"
+	"log"
 	"net/http"
+	"os"
 )
 
 func (h *Handlers) Download(w http.ResponseWriter, r *http.Request) {
@@ -19,10 +23,30 @@ func (h *Handlers) Download(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handlers) DownloadFile(w http.ResponseWriter, r *http.Request) {
-	var encrypted []byte = []byte("lemons")
-	var key = "lemons"
+	id := mux.Vars(r)["id"]
+	jsonData := mongodb.FindEntityViaUuid(h.collection, id)
 
-	plaintext := cryptography.Decrypt(key, encrypted)
+	jsonPointer := make(map[string]json.RawMessage)
+	err := json.Unmarshal(jsonData, &jsonPointer)
+	if err != nil {
+		h.log.Error(err.Error())
+	}
+
+	key := jsonPointer["encrypted_file_key"]
+	encryptedPath := jsonPointer["path_to_encrypted_file"]
+	// Open the file
+	file, err := os.Open(string(encryptedPath))
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
+	// Read the entire content of the file into a byte slice
+	encrypted, err := io.ReadAll(file)
+	if err != nil {
+		log.Fatal(err)
+	}
+	plaintext := cryptography.Decrypt(string(key), encrypted)
 
 	metadata, content := splitPlainText(string(plaintext))
 
@@ -38,6 +62,13 @@ func (h *Handlers) DownloadFile(w http.ResponseWriter, r *http.Request) {
 
 	// Write the content to the response body, which will be downloaded as a file
 	w.Write([]byte(content))
+
+	err = h.tpl.ExecuteTemplate(w, "nothing.gohtml", nil)
+	if err != nil {
+		h.log.Error(err.Error())
+	} else {
+		h.log.Info("ID " + id + " downloaded successfully")
+	}
 }
 
 func splitPlainText(plaintext string) (MetaData, string) {
