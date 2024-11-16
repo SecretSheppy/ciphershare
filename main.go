@@ -20,14 +20,11 @@ const (
 )
 
 func main() {
-	coll, client := mongodb.Connect()
+	// the _ is Collection
+	_, client := mongodb.Connect()
 	defer func() {
 		mongodb.Disconnect(client)
 	}()
-	//example of finding entity and getting entity
-	mongodb.FindEntityViaEmail(coll, "owalmsley1@sheffield.ac.uk")
-	emails := []string{"owalmsley1@sheffield.ac.uk", "Rturner3@sheffield.ac.uk"}
-	print(string(mongodb.CreateEntity(coll, emails, "this magic path", "This file key")))
 
 	//Other stuff
 	if err := godotenv.Load(); err != nil {
