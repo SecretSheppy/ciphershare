@@ -22,7 +22,7 @@ button, a {
     --dark-gray: #808080;
 }
 
-h1, h2, h3, h4, h5, h6, p, button, input, textarea, label {
+h1, h2, h3, h4, h5, h6, p, a, button, input, textarea, label {
     font-family: "Mona Sans", sans-serif;
     font-optical-sizing: auto;
     font-style: normal;
@@ -183,5 +183,50 @@ textarea.generic-form-input {
                 background: var(--dark-gray);
             }
         }
+    }
+}
+
+.generic-content-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.download-link-wrapper {
+    display: flex;
+    flex-direction: column;
+    border: solid 1px var(--light-gray);
+    border-radius: 10px;
+    overflow: hidden;
+
+    & > .link-wrapper-link-content {
+        padding: 20px;
+        text-align: center;
+    }
+
+    & > .copy-to-clipboard-button {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 10px;
+        gap: 10px;
+        border-top: solid 1px var(--light-gray);
+
+        & > .copy-button-icon {
+            width: 15px;
+        }
+
+        & > .copy-button-text {
+            font-size: 15px;
+        }
+    }
+}
+
+.generic-link {
+    color: var(--theme);
+    text-decoration-thickness: 1px;
+
+    &:hover {
+        opacity: 0.7;
     }
 }
