@@ -13,7 +13,7 @@ import (
 )
 
 // Connect return the database connection
-func Connect() *mongo.Collection {
+func Connect() (*mongo.Collection, *mongo.Client) {
 	uri := os.Getenv("MONGODB_URI")
 	if uri == "" {
 		log.Fatal("MONGODB_URI environment variable not set")
@@ -22,13 +22,14 @@ func Connect() *mongo.Collection {
 	if err != nil {
 		panic(err)
 	}
-	defer func() {
-		if err := client.Disconnect(context.TODO()); err != nil {
-			panic(err)
-		}
-	}()
+
 	coll := client.Database("security_go").Collection("go_project")
-	return coll
+	return coll, client
+}
+func Disconnect(client *mongo.Client) {
+	if err := client.Disconnect(context.TODO()); err != nil {
+		panic(err)
+	}
 }
 
 func FindEntityViaEmail(collection *mongo.Collection, emailToFind string) []byte {
