@@ -22,7 +22,7 @@ const (
 
 func main() {
 	// the _ is Collection
-	_, client := mongodb.Connect()
+	coll, client := mongodb.Connect()
 	defer func() {
 		mongodb.Disconnect(client)
 	}()
@@ -40,7 +40,6 @@ func main() {
 
 	h := handlers.NewHandlers(tpl, logger, coll)
 	m := middleware.New(logger)
-
 
 	r := mux.NewRouter()
 	r.Use(m.Logger)
