@@ -1,14 +1,18 @@
 package handlers
 
 import (
+	"github.com/gorilla/mux"
 	"net/http"
+	"os"
 )
 
 func (h *Handlers) Complete(w http.ResponseWriter, r *http.Request) {
 	data := struct {
-		Key string
+		Id     string
+		Domain string
 	}{
-		Key: "asmoranomardicadaistinaculdacar",
+		Id:     mux.Vars(r)["id"],
+		Domain: os.Getenv("DOMAIN"),
 	}
 	err := h.tpl.ExecuteTemplate(w, "complete.gohtml", data)
 	if err != nil {
