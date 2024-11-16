@@ -1,11 +1,13 @@
 package main
 
 import (
-	"fmt"
 	"github.com/gorilla/mux"
+	"github.com/lmittmann/tint"
 	"golang-encrypted-filesharing/handlers"
 	"html/template"
+	"log/slog"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -16,9 +18,12 @@ const (
 )
 
 func main() {
+	logger := slog.New(tint.NewHandler(os.Stdout, nil))
+	logger.Info("Starting encrypted file sharing system...")
+
 	tpl := template.Must(template.New("").ParseGlob("./templates/*.gohtml"))
 
-	h := handlers.NewHandlers(tpl)
+	h := handlers.NewHandlers(tpl, logger)
 
 	r := mux.NewRouter()
 	r.HandleFunc("/", h.Upload).Methods("GET")
@@ -34,6 +39,6 @@ func main() {
 
 	err := srv.ListenAndServeTLS(certificate, key)
 	if err != nil {
-		fmt.Println(err)
+		logger.Error(err.Error())
 	}
 }
