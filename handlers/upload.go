@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/base64"
 	"fmt"
 	"golang-encrypted-filesharing/cryptography"
 	"golang-encrypted-filesharing/mongodb"
@@ -54,13 +55,13 @@ func (h *Handlers) UploadFile(w http.ResponseWriter, r *http.Request) {
 
 func getFileName() string {
 
-	return string(cryptography.GenerateKey())
+	return base64.URLEncoding.EncodeToString(cryptography.GenerateKey())
 }
 
 func saveFile(file multipart.File, filename string) (string, string, error) {
 	defer file.Close()
 	folderPath := fmt.Sprintf("%s%s", RootPath, "\\files")
-	tempFile, err := os.Create(folderPath + "/" + filename)
+	tempFile, err := os.Create(folderPath + "\\" + filename)
 	if err != nil {
 		return "", "", err
 	}
@@ -74,5 +75,5 @@ func saveFile(file multipart.File, filename string) (string, string, error) {
 	}
 	tempFile.Write(encryptedFileBytes)
 
-	return key, "\\files" + filename, nil
+	return key, "\\files\\" + filename, nil
 }
