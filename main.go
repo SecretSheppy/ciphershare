@@ -1,17 +1,12 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"github.com/gorilla/mux"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 	"golang-encrypted-filesharing/handlers"
 	"golang-encrypted-filesharing/mongodb"
 	"html/template"
-	"log"
 	"net/http"
-	"os"
 	"time"
 )
 
