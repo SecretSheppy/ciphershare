@@ -24,10 +24,6 @@ func main() {
 	defer func() {
 		mongodb.Disconnect(client)
 	}()
-	//example of finding entity and getting entity
-	mongodb.FindEntityViaEmail(coll, "owalmsley1@sheffield.ac.uk")
-	emails := []string{"owalmsley1@sheffield.ac.uk", "Rturner3@sheffield.ac.uk"}
-	print(string(mongodb.CreateEntity(coll, emails, "this magic path", "This file key")))
 
 	//Other stuff
 	if err := godotenv.Load(); err != nil {
@@ -40,7 +36,7 @@ func main() {
 
 	tpl := template.Must(template.New("").ParseGlob("./templates/*.gohtml"))
 
-	h := handlers.NewHandlers(tpl, logger)
+	h := handlers.NewHandlers(tpl, logger, coll)
 
 	r := mux.NewRouter()
 	r.HandleFunc("/", h.Upload).Methods("GET")

@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"go.mongodb.org/mongo-driver/mongo"
 	"golang-encrypted-filesharing/cryptography"
 	"golang-encrypted-filesharing/mongodb"
 	"io"
@@ -26,7 +27,7 @@ func (h *Handlers) Upload(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *Handlers) UploadFile(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) UploadFile(w http.ResponseWriter, r *http.Request, collection mongo.Collection) {
 	err := r.ParseMultipartForm(500 << 20)
 	if err != nil {
 		h.log.Error(err.Error())
@@ -47,6 +48,7 @@ func (h *Handlers) UploadFile(w http.ResponseWriter, r *http.Request) {
 		h.log.Info("File has been downloaded")
 	}
 	// Upload path to database
+	mongodb.CreateEntity(collection, listOfEmails)
 
 }
 
