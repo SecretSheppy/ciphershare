@@ -18,7 +18,7 @@
     <title>Upload - CipherShare</title>
     <script src="https://code.jquery.com/jquery-4.0.0-beta.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
-    <script src="/static/JS/email-tags.js"></script>
+    <script src="/static/js/email-tags.js"></script>
     <link rel="icon" type="image/x-icon" href="/static/gfx/branding/favicon.webp">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -37,14 +37,7 @@
             <label for="emails" class="generic-form-label required">Emails</label>
             <p class="label-description">Enter at least one email address. You can enter multiple emails separated by commas. Any email entered into the system will be able to download the file you upload.</p>
             <textarea class="generic-form-input" id="emails" name="emails" placeholder="email@example.com, email2@example.com"></textarea>
-            <div class="email-tags-wrapper" id="email-tags">
-                <div class="email-tag">
-                    <p class="email-text">email@example.com</p>
-                    <button class="email-tag-removal-button">
-                        <img class="email-tag-removal-icon" src="/static/gfx/fontawesome/xmark-solid.svg" alt="xmark" />
-                    </button>
-                </div>
-            </div>
+            <div class="email-tags-wrapper" id="email-tags"></div>
         </div>
         <div class="form-section-wrapper">
             <label for="file-upload" class="generic-form-label required">File Upload</label>
