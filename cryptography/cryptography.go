@@ -41,15 +41,19 @@ func Encrypt(file string) (string, []byte) {
 }
 
 // For hashing the key phrase
-func mdHashing(input string) string {
-	byteInput := []byte(input)
+func mdHashing(byteInput []byte) string {
 	md5Hash := md5.Sum(byteInput)
 	return hex.EncodeToString(md5Hash[:]) // by referring to it as a string
 }
 
-func generateKey() string {
-	// TODO: make random
-	return "placeholder"
+func generateKey() []byte {
+	key := make([]byte, 32)
+	_, err := rand.Read(key)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	return key
 }
 
 func Decrypt(hashedKey string, ciphered []byte) string {
