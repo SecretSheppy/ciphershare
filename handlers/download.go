@@ -8,6 +8,7 @@ import (
 	"golang-encrypted-filesharing/mongodb"
 	"io"
 	"log"
+	"mime"
 	"net/http"
 	"os"
 )
@@ -54,12 +55,16 @@ func (h *Handlers) DownloadFile(w http.ResponseWriter, r *http.Request) {
 	// Set the headers to indicate a file download
 	w.Header().Set("Content-Disposition", "attachment; filename="+metadata.FileName) // Set the filename
 
-	// TODO: make dynamic
-	if metadata.Extension == ".txt" {
-		w.Header().Set("Content-Type", "text/plain")
-	} else if metadata.Extension == ".pdf" {
-		w.Header().Set("Content-Type", "application/pdf")
+	// Use the mime.TypeByExtension function to get the MIME type
+	contentType := mime.TypeByExtension(metadata.Extension)
+
+	// If the MIME type is not found, set it to "application/octet-stream"
+	if contentType == "" {
+		contentType = "application/octet-stream"
 	}
+
+	// Set the Content-Type header
+	w.Header().Set("Content-Type", contentType)
 
 	// Write the content to the response body, which will be downloaded as a file
 	w.Write([]byte(content))
