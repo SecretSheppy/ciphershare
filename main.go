@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
 	"github.com/lmittmann/tint"
@@ -21,9 +20,12 @@ const (
 )
 
 func main() {
-	coll := mongodb.Connect()
+	coll, client := mongodb.Connect()
+	defer func() {
+		mongodb.Disconnect(client)
+	}()
 	//example of finding entity and getting entity
-	mongodb.FindEntityViaEmail(coll, "Email1@gmail.com")
+	mongodb.FindEntityViaEmail(coll, "owalmsley1@sheffield.ac.uk")
 	emails := []string{"owalmsley1@sheffield.ac.uk", "Rturner3@sheffield.ac.uk"}
 	print(string(mongodb.CreateEntity(coll, emails, "this magic path", "This file key")))
 
