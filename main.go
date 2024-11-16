@@ -38,12 +38,14 @@ func main() {
 
 	tpl := template.Must(template.New("").ParseGlob("./templates/*.gohtml"))
 
-	h := handlers.NewHandlers(tpl, logger)
+	h := handlers.NewHandlers(tpl, logger, coll)
 	m := middleware.New(logger)
+
 
 	r := mux.NewRouter()
 	r.Use(m.Logger)
 	r.HandleFunc("/", h.Upload).Methods("GET")
+	r.HandleFunc("/", h.UploadFile).Methods("POST")
 	r.HandleFunc("/download/{key}", h.Download).Methods("GET")
 	r.HandleFunc("/complete", h.Complete).Methods("GET")
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))

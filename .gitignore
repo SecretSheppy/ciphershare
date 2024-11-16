@@ -4,4 +4,7 @@ server/ssl/
 
 ## Files ##
 .env
+.idea/*
 go.sum
+files/*
+
