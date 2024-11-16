@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"golang-encrypted-filesharing/cryptography"
 	"golang-encrypted-filesharing/mongodb"
@@ -36,14 +37,14 @@ func (h *Handlers) UploadFile(w http.ResponseWriter, r *http.Request) {
 		h.log.Info("Form is being parsed")
 	}
 
-	file, _, err := r.FormFile("fileUpload")
+	file, fileHeader, err := r.FormFile("fileUpload")
 	fmt.Println(file)
 	if err != nil {
 		h.log.Error(err.Error())
 	} else {
 		h.log.Info("File is being parsed")
 	}
-	key, path, err := saveFile(file, getFileName())
+	key, path, err := saveFile(file, fileHeader, getFileName())
 	if err != nil {
 		h.log.Error(err.Error())
 	} else {
@@ -51,6 +52,7 @@ func (h *Handlers) UploadFile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	mongodb.CreateEntity(h.collection, strings.Split(r.FormValue("emails"), ","), path, key)
+	h.log.Info("File is successfully uploaded")
 }
 
 func getFileName() string {
@@ -58,7 +60,12 @@ func getFileName() string {
 	return base64.URLEncoding.EncodeToString(cryptography.GenerateKey())
 }
 
-func saveFile(file multipart.File, filename string) (string, string, error) {
+type MetaData struct {
+	FileName  string
+	Extension string
+}
+
+func saveFile(file multipart.File, fileHeader *multipart.FileHeader, filename string) (string, string, error) {
 	defer file.Close()
 	folderPath := fmt.Sprintf("%s%s", RootPath, "\\files")
 	tempFile, err := os.Create(folderPath + "\\" + filename)
@@ -67,6 +74,24 @@ func saveFile(file multipart.File, filename string) (string, string, error) {
 	}
 	defer tempFile.Close()
 	filebytes, err := io.ReadAll(file)
+
+	// Prepend metadata before encryption
+	metadata := MetaData{
+		FileName:  fileHeader.Filename,
+		Extension: filepath.Ext(fileHeader.Filename),
+	}
+
+	// Serialize struct to JSON string
+	jsonData, err := json.Marshal(metadata)
+	if err != nil {
+		return "", "", err
+	}
+
+	// Convert JSON to string
+	jsonString := string(jsonData)
+
+	// Prepend
+	filebytes = []byte(jsonString + string(filebytes))
 
 	key, encryptedFileBytes := cryptography.Encrypt(filebytes)
 
