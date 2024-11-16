@@ -61,6 +61,7 @@ func (a *Auth) SendVerificationEmail(email string) error {
 	return nil
 }
 
+// ValidateOauthToken validates the code received by the user and returns the auth0 authorization token.
 func (a *Auth) ValidateOauthToken(email, code string) error {
 	client := resty.New()
 	url := fmt.Sprintf("https://%s/oauth/token", a.config.Auth0Domain)
