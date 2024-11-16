@@ -110,5 +110,5 @@ func saveFile(file multipart.File, fileHeader *multipart.FileHeader, filename st
 	}
 	tempFile.Write(encryptedFileBytes)
 
-	return key, "\\files\\" + filename, nil
+	return key, "files/" + filename, nil
 }

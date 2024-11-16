@@ -35,7 +35,8 @@ func (h *Handlers) DownloadFile(w http.ResponseWriter, r *http.Request) {
 	key := jsonPointer["encrypted_file_key"]
 	encryptedPath := jsonPointer["path_to_encrypted_file"]
 	// Open the file
-	file, err := os.Open(string(encryptedPath))
+	fmt.Println(os.Getwd())
+	file, err := os.Open(string(encryptedPath)[1 : len(string(encryptedPath))-1])
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -46,7 +47,7 @@ func (h *Handlers) DownloadFile(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	plaintext := cryptography.Decrypt(string(key), encrypted)
+	plaintext := cryptography.Decrypt(string(key)[1:len(string(key))-1], encrypted)
 
 	metadata, content := splitPlainText(string(plaintext))
 
