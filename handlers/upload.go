@@ -78,7 +78,7 @@ type MetaData struct {
 func saveFile(file multipart.File, fileHeader *multipart.FileHeader, filename string) (string, string, error) {
 	defer file.Close()
 	folderPath := fmt.Sprintf("%s%s", RootPath, "\\files")
-	tempFile, err := os.Create(folderPath + "\\" + filename)
+	tempFile, err := os.Create(filepath.Clean(folderPath + "\\" + filename))
 	if err != nil {
 		return "", "", err
 	}
@@ -110,5 +110,5 @@ func saveFile(file multipart.File, fileHeader *multipart.FileHeader, filename st
 	}
 	tempFile.Write(encryptedFileBytes)
 
-	return key, "\\files\\" + filename, nil
+	return key, filepath.Clean("files/" + filename), nil
 }
