@@ -29,26 +29,32 @@
 <body>
 <div class="main-content-wrapper">
     <div class="title-image-wrapper">
-        <img src="/static/gfx/branding/logo.webp" alt="CipherShare - Logo" />
+        <img class="title-image" src="/static/gfx/branding/logo.webp" alt="CipherShare - Logo" />
     </div>
-    <form method="POST" enctype="multipart/form-data">
+    <form class="generic-form" method="POST" enctype="multipart/form-data">
         <div class="form-section-wrapper">
             <label for="emails" class="generic-form-label required">Emails</label>
+            <p class="label-description">Enter at least one email address. You can enter multiple emails separated by commas. Any email entered into the system will be able to download the file you upload.</p>
             <textarea class="generic-form-input" id="emails" name="emails" placeholder="email@example.com, email2@example.com"></textarea>
             <div class="email-tags-wrapper" id="email-tags">
                 <div class="email-tag">
                     <p class="email-text">email@example.com</p>
                     <button class="email-tag-removal-button">
-                        <img src="/static/gfx/fontawesome/xmark-solid.svg" alt="xmark" />
+                        <img class="email-tag-removal-icon" src="/static/gfx/fontawesome/xmark-solid.svg" alt="xmark" />
                     </button>
                 </div>
             </div>
         </div>
         <div class="form-section-wrapper">
             <label for="file-upload" class="generic-form-label required">File Upload</label>
-            <input type="file" id="file-upload" name="fileUpload" class="file-input-field">
+            <p class="label-description">Upload a file to share or store online. The file will be encrypted and will only be related to you by your email. You will always be able to download this file by using the generated download link and entering the one time password that is sent to your email.</p>
+            <label for="file-upload" class="file-drag-drop-wrapper">
+                <span class="hint">Drag and Drop Files</span>
+                or
+                <input type="file" id="file-upload" name="fileUpload" class="file-input-field">
+            </label>
         </div>
-        <button type="submit">Save and Upload</button>
+        <button class="submit-button" type="submit">Save and Upload</button>
     </form>
 </div>
 </body>

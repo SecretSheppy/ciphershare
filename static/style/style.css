@@ -1,0 +1,187 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+input, button, textarea {
+    outline: none;
+    border: none;
+}
+
+button, a {
+    &:hover {
+        cursor: pointer;
+    }
+}
+
+:root {
+    --theme: #166B16;
+    --theme-light: rgba(22, 107, 22, 0.19);
+    --light-gray: #cccccc;
+    --dark-gray: #808080;
+}
+
+h1, h2, h3, h4, h5, h6, p, button, input, textarea, label {
+    font-family: "Mona Sans", sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+    color: #000;
+}
+
+.main-content-wrapper {
+    width: 500px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 0 0 100px 0;
+
+    & > .title-image-wrapper {
+        width: 100%;
+        height: 100px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        & > .title-image {
+            width: 300px;
+        }
+    }
+
+    & > .generic-form {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+
+        & > .form-section-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+    }
+}
+
+.generic-form-label {
+    font-weight: 600;
+    font-size: 15px;
+
+    &.required {
+        &::after {
+            content: "*";
+            color: red;
+        }
+    }
+}
+
+.label-description {
+    font-size: 13px;
+    opacity: 0.8;
+}
+
+.generic-form-input {
+    padding: 10px;
+    font-size: 15px;
+    border: solid 1px var(--light-gray);
+    border-radius: 10px;
+
+    &:focus {
+        outline: solid 2px var(--theme);
+        outline-offset: -1px;
+    }
+}
+
+textarea.generic-form-input {
+    height: 100px;
+    resize: none;
+}
+
+.email-tags-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+
+    & > .email-tag {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border-radius: 100px;
+        padding: 5px 5px 5px 10px;
+        background: var(--theme-light);
+
+        & > .email-text {
+            font-size: 13px;
+        }
+
+        & > .email-tag-removal-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 23px;
+            height: 23px;
+            background: transparent;
+            border-radius: 100px;
+
+            & > .email-tag-removal-icon {
+                width: 12px;
+            }
+
+            &:hover {
+                background: var(--theme);
+
+                & > .email-tag-removal-icon {
+                    filter: invert(1);
+                }
+            }
+        }
+    }
+}
+
+.submit-button {
+    padding: 10px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #fff;
+    background: var(--theme);
+    border-radius: 10px;
+
+    &:hover {
+        opacity: 0.7;
+    }
+}
+
+.file-drag-drop-wrapper {
+    padding: 20px;
+    border-radius: 10px;
+    outline: dashed 1px var(--light-gray);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+
+    & > .hint {
+        font-size: 15px;
+        font-weight: 500;
+    }
+
+    & > .file-input-field {
+        border: solid 1px var(--light-gray);
+        border-radius: 10px;
+        overflow: hidden;
+
+        &::file-selector-button {
+            padding: 10px 15px;
+            font-size: 15px;
+            font-weight: 500;
+            color: #000;
+            background: var(--light-gray);
+            outline: none;
+            border: none;
+            margin-right: 15px;
+
+            &:hover {
+                background: var(--dark-gray);
+            }
+        }
+    }
+}
