@@ -1,2 +1,5 @@
 server/ssl/
 .env
+.idea/*
+go.sum
+go.sum
