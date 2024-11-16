@@ -51,8 +51,18 @@ func (h *Handlers) UploadFile(w http.ResponseWriter, r *http.Request) {
 		h.log.Info("File has been downloaded")
 	}
 
-	mongodb.CreateEntity(h.collection, strings.Split(r.FormValue("emails"), ","), path, key)
+	uuidJson := mongodb.CreateEntity(h.collection, strings.Split(r.FormValue("emails"), ","), path, key)
 	h.log.Info("File is successfully uploaded")
+
+	jsonPointer := make(map[string]json.RawMessage)
+	err = json.Unmarshal(uuidJson, &jsonPointer)
+	if err != nil {
+		h.log.Error(err.Error())
+	}
+	uuid := string(jsonPointer["InsertedID"])
+	uuid = uuid[1 : len(uuid)-1]
+
+	http.Redirect(w, r, "/complete/"+uuid, http.StatusSeeOther)
 }
 
 func getFileName() string {
