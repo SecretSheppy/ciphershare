@@ -53,13 +53,14 @@ func (h *Handlers) UploadFile(w http.ResponseWriter, r *http.Request) {
 }
 
 func getFileName() string {
-	return "name"
+
+	return string(cryptography.GenerateKey())
 }
 
 func saveFile(file multipart.File, filename string) (string, string, error) {
 	defer file.Close()
 	folderPath := fmt.Sprintf("%s%s", RootPath, "\\files")
-	tempFile, err := os.CreateTemp(folderPath, filename)
+	tempFile, err := os.Create(folderPath + "/" + filename)
 	if err != nil {
 		return "", "", err
 	}
@@ -73,7 +74,5 @@ func saveFile(file multipart.File, filename string) (string, string, error) {
 	}
 	tempFile.Write(encryptedFileBytes)
 
-	fullPath := folderPath + "\\" + filename
-
-	return key, fullPath, nil
+	return key, "\\files" + filename, nil
 }

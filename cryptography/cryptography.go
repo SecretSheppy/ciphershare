@@ -12,7 +12,7 @@ import (
 )
 
 func Encrypt(value []byte) (string, []byte) {
-	keyPhrase := generateKey()
+	keyPhrase := GenerateKey()
 
 	// Key phrase is hashed for increased security as assumed you are passing it in
 	// As is randomly generated probably not required
@@ -45,7 +45,7 @@ func mdHashing(byteInput []byte) string {
 	return hex.EncodeToString(md5Hash[:]) // by referring to it as a string
 }
 
-func generateKey() []byte {
+func GenerateKey() []byte {
 	key := make([]byte, 32)
 	_, err := rand.Read(key)
 	if err != nil {
