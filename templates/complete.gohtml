@@ -18,7 +18,7 @@
     <title>Upload Completed - CipherShare</title>
     <script src="https://code.jquery.com/jquery-4.0.0-beta.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
-    <script src="/static/js/email-tags.js"></script>
+    <script src="/static/js/clipboard-copy.js"></script>
     <link rel="icon" type="image/x-icon" href="/static/gfx/branding/favicon.webp">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -37,9 +37,9 @@
         <p class="label-description">Use the following link to access your file. Upon clicking the link you will be asked to enter your email, and upon doing so successfully you will receive a one time password. <strong>You will not be able to recover this link</strong> after you exit the page, so make sure to keep hold of it.</p>
         <div class="download-link-wrapper">
             <div class="link-wrapper-link-content">
-                <a class="generic-link" href="{{.Domain}}/files/{{.Id}}">{{.Domain}}/files/{{.Id}}</a>
+                <a class="generic-link" id="link-to-copy" href="{{.Domain}}/files/{{.Id}}">{{.Domain}}/files/{{.Id}}</a>
             </div>
-            <button class="copy-to-clipboard-button">
+            <button class="copy-to-clipboard-button" id="copy-to-clipboard">
                 <img class="copy-button-icon" src="/static/gfx/fontawesome/copy-solid.svg" alt="clipboard icon" />
                 <p class="copy-button-text">Copy to Clipboard</p>
             </button>
