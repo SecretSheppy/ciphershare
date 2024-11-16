@@ -60,3 +60,35 @@ func (a *Auth) SendVerificationEmail(email string) error {
 	a.log.Info("Verification email sent")
 	return nil
 }
+
+func (a *Auth) ValidateOauthToken(email, code string) error {
+	client := resty.New()
+	url := fmt.Sprintf("https://%s/oauth/token", a.config.Auth0Domain)
+
+	payload := map[string]string{
+		"grant_type":    "http://auth0.com/oauth/grant-type/passwordless/otp",
+		"client_id":     a.config.ClientID,
+		"client_secret": a.config.ClientSecret,
+		"username":      email,
+		"otp":           code,
+		"realm":         "email",
+	}
+
+	resp, err := client.R().
+		SetHeader("Content-Type", "application/json").
+		SetBody(payload).
+		Post(url)
+	if err != nil {
+		a.log.Error("Failed to validate oauth token", "error", err)
+		return err
+	}
+
+	if resp.StatusCode() != 200 {
+		a.log.Error("Failed to validate oauth token with status code",
+			"code", resp.StatusCode(), "status", resp.Status())
+		return errors.New("failed to validate oauth token with status code")
+	}
+
+	a.log.Info("Validated email successfully")
+	return nil
+}
