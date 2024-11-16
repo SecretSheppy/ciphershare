@@ -53,7 +53,11 @@ func FindEntityViaEmail(collection *mongo.Collection, emailToFind string) []byte
 }
 func FindEntityViaUuid(collection *mongo.Collection, uuidToFind string) []byte {
 	var result bson.M
-	err := collection.FindOne(context.TODO(), bson.D{{"_id", primitive.ObjectIDFromHex(uuidToFind)}}).Decode(&result)
+	objectId, idErr := primitive.ObjectIDFromHex(uuidToFind)
+	if idErr != nil {
+		panic(idErr)
+	}
+	err := collection.FindOne(context.TODO(), bson.D{{"_id", objectId}}).Decode(&result)
 	if errors.Is(err, mongo.ErrNoDocuments) {
 		fmt.Printf("No document was found with the name %s\n", uuidToFind)
 		return nil
