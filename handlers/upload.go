@@ -32,16 +32,17 @@ func (h *Handlers) UploadFile(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		h.log.Error(err.Error())
 	} else {
-		h.log.Info("Form is being parse")
+		h.log.Info("Form is being parsed")
 	}
 
-	file, handler, err := r.FormFile("fileUpload")
+	file, _, err := r.FormFile("fileUpload")
+	fmt.Println(file)
 	if err != nil {
 		h.log.Error(err.Error())
 	} else {
 		h.log.Info("File is being parsed")
 	}
-	key, path, err := saveFile(file, handler, getFileName())
+	key, path, err := saveFile(file, getFileName())
 	if err != nil {
 		h.log.Error(err.Error())
 	} else {
@@ -55,7 +56,7 @@ func getFileName() string {
 	return "name"
 }
 
-func saveFile(file multipart.File, handler *multipart.FileHeader, filename string) (string, string, error) {
+func saveFile(file multipart.File, filename string) (string, string, error) {
 	defer file.Close()
 	folderPath := fmt.Sprintf("%s%s", RootPath, "\\files")
 	tempFile, err := os.CreateTemp(folderPath, filename)
