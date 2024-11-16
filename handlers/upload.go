@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"golang-encrypted-filesharing/cryptography"
 	"net/http"
 )
 
@@ -25,7 +26,12 @@ func (h *Handlers) UploadFile(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(r.FormValue("fileUpload"))
 
 	// Encrypt the file
+	key, encryptedFile := cryptography.Encrypt(r.FormValue("fileUpload"))
+
 	// Upload file to folder
+
 	// Upload path to database
+
 	// Upload emails to database
+
 }
