@@ -62,7 +62,19 @@ func (h *Handlers) UploadFile(w http.ResponseWriter, r *http.Request) {
 	uuid := string(jsonPointer["InsertedID"])
 	uuid = uuid[1 : len(uuid)-1]
 
-	http.Redirect(w, r, "/complete/"+uuid, http.StatusSeeOther)
+	data := struct {
+		Id     string
+		Domain string
+	}{
+		Id:     uuid,
+		Domain: os.Getenv("DOMAIN"),
+	}
+	err = h.tpl.ExecuteTemplate(w, "complete.gohtml", data)
+	if err != nil {
+		h.log.Error(err.Error())
+	} else {
+		h.log.Info("Upload completion page accessed")
+	}
 }
 
 func getFileName() string {
