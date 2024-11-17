@@ -51,9 +51,11 @@ func (h *Handlers) UploadFile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	file, fileHeader, err := r.FormFile("fileUpload")
-	fmt.Println(file)
 	if err != nil {
 		h.log.Error(err.Error())
+	} else if file == nil {
+		h.log.Warn("File is empty")
+		http.Redirect(w, r, "/?error=3", http.StatusSeeOther)
 	} else {
 		h.log.Info("File is being parsed")
 	}
