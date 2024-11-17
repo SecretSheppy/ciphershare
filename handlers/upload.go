@@ -17,17 +17,23 @@ import (
 )
 
 var (
-	_, b, _, _ = runtime.Caller(0)
-	RootPath   = filepath.Join(filepath.Dir(b), "../")
+	_, b, _, _         = runtime.Caller(0)
+	RootPath           = filepath.Join(filepath.Dir(b), "../")
+	errorCodeToMessage = map[string]string{
+		"1": "You haven't given any emails!",
+		"2": "The emails provided weren't valid.",
+		"3": "You haven't uploaded a file!",
+		"4": "There was a problem uploading your file. Please try again.",
+		"5": "There was a problem storing your file. Please try again.",
+	}
 )
 
 func (h *Handlers) Upload(w http.ResponseWriter, r *http.Request) {
 	data := struct {
 		Error string
 	}{
-		Error: r.URL.Query().Get("error"),
+		Error: errorCodeToMessage[r.URL.Query().Get("error")],
 	}
-	fmt.Println(r.URL.Query().Get("error"))
 	err := h.tpl.ExecuteTemplate(w, "upload.gohtml", data)
 	if err != nil {
 		h.log.Error(err.Error())
@@ -73,6 +79,7 @@ func (h *Handlers) UploadFile(w http.ResponseWriter, r *http.Request) {
 		h.log.Error(err.Error())
 		// File hasn't been downloaded
 		http.Redirect(w, r, "/?error=4", http.StatusSeeOther)
+		return
 	} else {
 		h.log.Info("File has been downloaded")
 	}
@@ -81,6 +88,7 @@ func (h *Handlers) UploadFile(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		h.log.Error(err.Error())
 		http.Redirect(w, r, "/?error=5", http.StatusSeeOther)
+		return
 	} else {
 		h.log.Info("Entity created")
 	}
