@@ -36,6 +36,9 @@
         <h1 class="generic-form-label">Your upload has been completed</h1>
         <p class="label-description">Use the following link to access your file. Upon clicking the link you will be asked to enter your email, and upon doing so successfully you will receive a one time password. <strong>You will not be able to recover this link</strong> after you exit the page, so make sure to keep hold of it.</p>
         <div class="download-link-wrapper">
+            <div class="copied-success-message hidden" id="copied-success-message">
+                <p class="copied-success-text">Copied to Clipboard</p>
+            </div>
             <div class="link-wrapper-link-content">
                 <a class="generic-link" id="link-to-copy" href="{{.Domain}}/files/{{.Id}}">{{.Domain}}/files/{{.Id}}</a>
             </div>

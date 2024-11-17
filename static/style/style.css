@@ -208,6 +208,7 @@ textarea.generic-form-input {
     border: solid 1px var(--light-gray);
     border-radius: 10px;
     overflow: hidden;
+    position: relative;
 
     & > .link-wrapper-link-content {
         padding: 20px;
@@ -238,5 +239,23 @@ textarea.generic-form-input {
 
     &:hover {
         opacity: 0.7;
+    }
+}
+
+.hidden {
+    display: none;
+}
+
+.copied-success-message {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: var(--theme);
+    border-radius: 10px;
+    padding: 10px;
+
+    & > .copied-success-text {
+        font-size: 13px;
+        color: #fff;
     }
 }
