@@ -74,12 +74,6 @@ func (h *Handlers) DownloadFile(w http.ResponseWriter, r *http.Request) {
 	// Write the content to the response body, which will be downloaded as a file
 	w.Write([]byte(content))
 
-	err = h.tpl.ExecuteTemplate(w, "nothing.gohtml", nil)
-	if err != nil {
-		h.log.Error(err.Error())
-	} else {
-		h.log.Info("ID " + id + " downloaded successfully")
-	}
 }
 
 func splitPlainText(plaintext string) (MetaData, string) {
