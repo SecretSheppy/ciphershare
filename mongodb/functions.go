@@ -72,7 +72,7 @@ func FindEntityViaUuid(collection *mongo.Collection, uuidToFind string) (error, 
 	fmt.Println(string(jsonData))
 	return nil, jsonData
 }
-func CreateEntity(collection *mongo.Collection, listOfEmails []string, pathToEncryptedFile string, fileKey string) []byte {
+func CreateEntity(collection *mongo.Collection, listOfEmails []string, pathToEncryptedFile string, fileKey string) (error, []byte) {
 	doc := bson.D{
 		{"list_of_emails", listOfEmails},
 		{"path_to_encrypted_file", pathToEncryptedFile},
@@ -80,12 +80,12 @@ func CreateEntity(collection *mongo.Collection, listOfEmails []string, pathToEnc
 	}
 	result, err := collection.InsertOne(context.Background(), doc)
 	if err != nil {
-		panic(err)
+		return err, nil
 	}
 	fmt.Println("Inserted a single document: ", result.InsertedID)
 	jsonData, err := json.MarshalIndent(result, "", "    ")
 	if err != nil {
-		panic(err)
+		return err, nil
 	}
-	return jsonData
+	return nil, jsonData
 }
