@@ -42,6 +42,20 @@ func (h *Handlers) Upload(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (h *Handlers) UploadError(w http.ResponseWriter, r *http.Request, uploadErr string) {
+	data := struct {
+		Error string
+	}{
+		Error: errorCodeToMessage[uploadErr],
+	}
+	err := h.tpl.ExecuteTemplate(w, "upload.gohtml", data)
+	if err != nil {
+		h.log.Error(err.Error())
+	} else {
+		h.log.Info("Upload page accessed with an error displayed")
+	}
+}
+
 func (h *Handlers) UploadFile(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseMultipartForm(500 << 20)
 	if err != nil {
@@ -52,7 +66,7 @@ func (h *Handlers) UploadFile(w http.ResponseWriter, r *http.Request) {
 	emailForm := r.FormValue("emails")
 	if emailForm == "" {
 		h.log.Warn("Email is empty")
-		http.Redirect(w, r, "/?error=1", http.StatusSeeOther)
+		h.UploadError(w, r, "1")
 		return
 	}
 	emailForm = strings.ReplaceAll(emailForm, " ", "")
@@ -60,7 +74,7 @@ func (h *Handlers) UploadFile(w http.ResponseWriter, r *http.Request) {
 	for _, email := range emails {
 		if !validation.IsEmailValid(email) {
 			h.log.Warn("Email is not valid")
-			http.Redirect(w, r, "/?error=2", http.StatusSeeOther)
+			h.UploadError(w, r, "2")
 			return
 		}
 	}
@@ -68,7 +82,7 @@ func (h *Handlers) UploadFile(w http.ResponseWriter, r *http.Request) {
 	file, fileHeader, err := r.FormFile("fileUpload")
 	if file == nil {
 		h.log.Warn("File is empty")
-		http.Redirect(w, r, "/?error=3", http.StatusSeeOther)
+		h.UploadError(w, r, "3")
 		return
 	} else if err != nil {
 		h.log.Error(err.Error())
@@ -79,6 +93,8 @@ func (h *Handlers) UploadFile(w http.ResponseWriter, r *http.Request) {
 	key, path, err := saveFile(file, fileHeader, getFileName())
 	if err != nil {
 		h.log.Error(err.Error())
+		h.UploadError(w, r, "4")
+		return
 	} else {
 		h.log.Info("File has been downloaded")
 	}
@@ -86,7 +102,7 @@ func (h *Handlers) UploadFile(w http.ResponseWriter, r *http.Request) {
 	err, uuidJson := mongodb.CreateEntity(h.collection, emails, path, key)
 	if err != nil {
 		h.log.Error(err.Error())
-		http.Redirect(w, r, "/?error=5", http.StatusSeeOther)
+		h.UploadError(w, r, "5")
 		return
 	} else {
 		h.log.Info("Entity created")
