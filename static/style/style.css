@@ -93,6 +93,10 @@ h1, h2, h3, h4, h5, h6, p, a, button, input, textarea, label {
         outline: solid 2px var(--theme);
         outline-offset: -1px;
     }
+
+    &.centered {
+        text-align: center;
+    }
 }
 
 textarea.generic-form-input {
@@ -257,5 +261,18 @@ textarea.generic-form-input {
     & > .copied-success-text {
         font-size: 13px;
         color: #fff;
+    }
+}
+
+.error {
+    display: flex;
+    gap: 10px;
+
+    & > .error-icon {
+        width: 15px;
+    }
+
+    & > .error-text {
+        color: red;
     }
 }

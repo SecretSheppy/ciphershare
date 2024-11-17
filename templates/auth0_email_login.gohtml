@@ -39,10 +39,13 @@
             <p class="label-description">You must enter your email to receive a one time password in order to download this file.</p>
             <input class="generic-form-input" id="email" name="email" placeholder="email@example.com">
             {{ if .EmailError }}
-                <p>The entered email does not have access to this document</p>
+                <div class="error">
+                    <img class="error-icon" src="/static/gfx/fontawesome/circle-exclamation-solid.svg" alt="error icon" />
+                    <p class="error-text">The entered email does not have access to this document</p>
+                </div>
             {{ end }}
         </div>
-        <button class="submit-button" type="submit">Send One Time Password</button>
+        <button class="submit-button" type="submit">Get One Time Password</button>
     </form>
 </div>
 </body>

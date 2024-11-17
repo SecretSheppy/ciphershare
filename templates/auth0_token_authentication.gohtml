@@ -37,12 +37,15 @@
         <input type="hidden" name="email" value="{{ .Email }}">
         <div class="form-section-wrapper">
             <label for="otp" class="generic-form-label required">One Time Password</label>
-            <input class="generic-form-input" id="otp" name="otp" placeholder="Enter One Time Password">
+            <input class="generic-form-input centered" id="otp" name="otp" placeholder="Enter One Time Password">
             {{ if .OTPError }}
-                <p>One Time Password was incorrect</p>
+                <div class="error">
+                    <img class="error-icon" src="/static/gfx/fontawesome/circle-exclamation-solid.svg" alt="error icon" />
+                    <p class="error-text">One Time Password was incorrect</p>
+                </div>
             {{ end }}
         </div>
-        <button class="submit-button" type="submit">Send One Time Password</button>
+        <button class="submit-button" type="submit">Submit One Time Password</button>
     </form>
 </div>
 </body>

@@ -50,11 +50,12 @@
         </div>
         <button class="submit-button" type="submit">Save and Upload</button>
     </form>
-    <h3>
-        {{ if .Error}}
-            ERROR: {{.Error}}
-        {{ end }}
-    </h3>
+    {{ if .Error }}
+        <div class="error">
+            <img class="error-icon" src="/static/gfx/fontawesome/circle-exclamation-solid.svg" alt="error icon" />
+            <p class="error-text">{{ .Error }}</p>
+        </div>
+    {{ end }}
 </div>
 </body>
 </html>
