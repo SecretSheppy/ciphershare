@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gorilla/mux"
+	"github.com/gorilla/sessions"
 	"github.com/joho/godotenv"
 	"github.com/lmittmann/tint"
 	"golang-encrypted-filesharing/handlers"
@@ -38,7 +39,9 @@ func main() {
 
 	tpl := template.Must(template.New("").ParseGlob("./templates/*.gohtml"))
 
-	h := handlers.NewHandlers(tpl, logger, coll)
+	store := sessions.NewCookieStore([]byte("example-key"))
+
+	h := handlers.NewHandlers(tpl, logger, coll, store)
 	m := middleware.New(logger)
 
 	r := mux.NewRouter()
@@ -48,6 +51,8 @@ func main() {
 	r.HandleFunc("/files/{key}", h.Download).Methods("GET")
 	r.HandleFunc("/download/{id}", h.DownloadFile).Methods("GET")
 	r.HandleFunc("/complete/{id}", h.Complete).Methods("GET")
+	r.HandleFunc("/auth", h.Authenticate).Methods("POST")
+	r.HandleFunc("/auth/token", h.AuthToken).Methods("POST")
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
 	srv := &http.Server{
