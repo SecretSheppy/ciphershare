@@ -55,6 +55,7 @@ func (h *Handlers) UploadFile(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/?error=1", http.StatusSeeOther)
 		return
 	}
+	emailForm = strings.ReplaceAll(emailForm, " ", "")
 	emails := strings.Split(emailForm, ",")
 	for _, email := range emails {
 		if !validation.IsEmailValid(email) {
