@@ -71,11 +71,19 @@ func (h *Handlers) UploadFile(w http.ResponseWriter, r *http.Request) {
 	key, path, err := saveFile(file, fileHeader, getFileName())
 	if err != nil {
 		h.log.Error(err.Error())
+		// File hasn't been downloaded
+		http.Redirect(w, r, "/?error=4", http.StatusSeeOther)
 	} else {
 		h.log.Info("File has been downloaded")
 	}
 
-	uuidJson := mongodb.CreateEntity(h.collection, emails, path, key)
+	err, uuidJson := mongodb.CreateEntity(h.collection, emails, path, key)
+	if err != nil {
+		h.log.Error(err.Error())
+		http.Redirect(w, r, "/?error=5", http.StatusSeeOther)
+	} else {
+		h.log.Info("Entity created")
+	}
 	h.log.Info("File is successfully uploaded")
 
 	jsonPointer := make(map[string]json.RawMessage)
