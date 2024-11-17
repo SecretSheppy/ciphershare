@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"golang-encrypted-filesharing/cryptography"
 	"golang-encrypted-filesharing/mongodb"
+	"golang-encrypted-filesharing/validation"
 	"io"
 	"mime/multipart"
 	"net/http"
@@ -36,6 +37,18 @@ func (h *Handlers) UploadFile(w http.ResponseWriter, r *http.Request) {
 	} else {
 		h.log.Info("Form is being parsed")
 	}
+	emailForm := r.FormValue("emails")
+	if emailForm == "" {
+		h.log.Warn("Email is empty")
+		http.Redirect(w, r, "/?error=1", http.StatusSeeOther)
+	}
+	emails := strings.Split(emailForm, ",")
+	for _, email := range emails {
+		if !validation.IsEmailValid(email) {
+			h.log.Warn("Email is not valid")
+			http.Redirect(w, r, "/?error=2", http.StatusSeeOther)
+		}
+	}
 
 	file, fileHeader, err := r.FormFile("fileUpload")
 	fmt.Println(file)
@@ -51,7 +64,7 @@ func (h *Handlers) UploadFile(w http.ResponseWriter, r *http.Request) {
 		h.log.Info("File has been downloaded")
 	}
 
-	uuidJson := mongodb.CreateEntity(h.collection, strings.Split(r.FormValue("emails"), ","), path, key)
+	uuidJson := mongodb.CreateEntity(h.collection, emails, path, key)
 	h.log.Info("File is successfully uploaded")
 
 	jsonPointer := make(map[string]json.RawMessage)
