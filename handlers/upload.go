@@ -38,12 +38,12 @@ func (h *Handlers) UploadFile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	file, fileHeader, err := r.FormFile("fileUpload")
-	fmt.Println(file)
 	if err != nil {
 		h.log.Error(err.Error())
 	} else {
 		h.log.Info("File is being parsed")
 	}
+
 	key, path, err := saveFile(file, fileHeader, getFileName())
 	if err != nil {
 		h.log.Error(err.Error())
@@ -65,8 +65,8 @@ func (h *Handlers) UploadFile(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/complete/"+uuid, http.StatusSeeOther)
 }
 
+// getFileName creates a random string
 func getFileName() string {
-
 	return base64.URLEncoding.EncodeToString(cryptography.GenerateKey())
 }
 
@@ -83,7 +83,7 @@ func saveFile(file multipart.File, fileHeader *multipart.FileHeader, filename st
 		return "", "", err
 	}
 	defer tempFile.Close()
-	filebytes, err := io.ReadAll(file)
+	fileBytes, err := io.ReadAll(file)
 
 	// Prepend metadata before encryption
 	metadata := MetaData{
@@ -101,9 +101,9 @@ func saveFile(file multipart.File, fileHeader *multipart.FileHeader, filename st
 	jsonString := string(jsonData)
 
 	// Prepend
-	filebytes = []byte(jsonString + string(filebytes))
+	fileBytes = []byte(jsonString + string(fileBytes))
 
-	key, encryptedFileBytes := cryptography.Encrypt(filebytes)
+	key, encryptedFileBytes := cryptography.Encrypt(fileBytes)
 
 	if err != nil {
 		return "", "", err

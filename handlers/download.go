@@ -7,7 +7,7 @@ import (
 	"golang-encrypted-filesharing/cryptography"
 	"golang-encrypted-filesharing/mongodb"
 	"io"
-	"log"
+	"mime"
 	"net/http"
 	"os"
 )
@@ -22,6 +22,7 @@ func (h *Handlers) Download(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// DownloadFile Handles actually downloading the file onto the device
 func (h *Handlers) DownloadFile(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 	jsonData := mongodb.FindEntityViaUuid(h.collection, id)
@@ -34,44 +35,44 @@ func (h *Handlers) DownloadFile(w http.ResponseWriter, r *http.Request) {
 
 	key := jsonPointer["encrypted_file_key"]
 	encryptedPath := jsonPointer["path_to_encrypted_file"]
+
 	// Open the file
-	fmt.Println(os.Getwd())
-	file, err := os.Open(string(encryptedPath)[1 : len(string(encryptedPath))-1])
+	file, err := os.Open(trimFirstLast(string(encryptedPath)))
 	if err != nil {
-		log.Fatal(err)
+		h.log.Error(err.Error())
 	}
 	defer file.Close()
 
 	// Read the entire content of the file into a byte slice
 	encrypted, err := io.ReadAll(file)
 	if err != nil {
-		log.Fatal(err)
+		h.log.Error(err.Error())
 	}
-	plaintext := cryptography.Decrypt(string(key)[1:len(string(key))-1], encrypted)
+	plaintext := cryptography.Decrypt(trimFirstLast(string(key)), encrypted)
 
-	metadata, content := splitPlainText(string(plaintext))
+	metadata, content := splitPlainText(plaintext)
 
 	// Set the headers to indicate a file download
 	w.Header().Set("Content-Disposition", "attachment; filename="+metadata.FileName) // Set the filename
 
-	// TODO: make dynamic
-	if metadata.Extension == ".txt" {
-		w.Header().Set("Content-Type", "text/plain")
-	} else if metadata.Extension == ".pdf" {
-		w.Header().Set("Content-Type", "application/pdf")
+	// Use the mime.TypeByExtension function to get the MIME type
+	contentType := mime.TypeByExtension(metadata.Extension)
+
+	// If the MIME type is not found, set it to "application/octet-stream"
+	if contentType == "" {
+		contentType = "application/octet-stream"
 	}
+
+	// Set the Content-Type header
+	w.Header().Set("Content-Type", contentType)
 
 	// Write the content to the response body, which will be downloaded as a file
 	w.Write([]byte(content))
 
-	err = h.tpl.ExecuteTemplate(w, "nothing.gohtml", nil)
-	if err != nil {
-		h.log.Error(err.Error())
-	} else {
-		h.log.Info("ID " + id + " downloaded successfully")
-	}
+	h.log.Info("ID " + id + " downloaded successfully")
 }
 
+// splitPlainText extracts json from the start of a string and returns it as metadata
 func splitPlainText(plaintext string) (MetaData, string) {
 	// Extract JSON dynamically
 	var metadata MetaData
@@ -94,4 +95,8 @@ func splitPlainText(plaintext string) (MetaData, string) {
 
 	// Extract JSON and original message
 	return metadata, plaintext[jsonLength:]
+}
+
+func trimFirstLast(s string) string {
+	return s[1 : len(string(s))-1]
 }
