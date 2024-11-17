@@ -15,9 +15,10 @@ import (
 func (h *Handlers) Download(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
-	err, _ := mongodb.FindEntityViaUuid(h.collection, vars["id"])
+	err, _ := mongodb.FindEntityViaUuid(h.collection, vars["key"])
 	if err != nil {
 		h.log.Warn("Invalid download page ID")
+		h.log.Error(err.Error())
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 	}
 	err = h.tpl.ExecuteTemplate(w, "download.gohtml", vars)

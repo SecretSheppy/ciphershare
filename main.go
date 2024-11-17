@@ -47,7 +47,6 @@ func main() {
 	r.HandleFunc("/", h.UploadFile).Methods("POST")
 	r.HandleFunc("/files/{key}", h.Download).Methods("GET")
 	r.HandleFunc("/download/{id}", h.DownloadFile).Methods("GET")
-	r.HandleFunc("/complete/{id}", h.Complete).Methods("GET")
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
 	srv := &http.Server{
