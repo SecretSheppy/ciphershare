@@ -135,6 +135,7 @@ func saveFile(file multipart.File, fileHeader *multipart.FileHeader, filename st
 		return "", "", err
 	}
 	defer tempFile.Close()
+
 	filebytes, err := io.ReadAll(file)
 
 	// Prepend metadata before encryption
@@ -157,10 +158,7 @@ func saveFile(file multipart.File, fileHeader *multipart.FileHeader, filename st
 
 	key, encryptedFileBytes := cryptography.Encrypt(filebytes)
 
-	if err != nil {
-		return "", "", err
-	}
-	tempFile.Write(encryptedFileBytes)
+	_, err = tempFile.Write(encryptedFileBytes)
 
 	return key, filepath.Clean("files/" + filename), nil
 }
