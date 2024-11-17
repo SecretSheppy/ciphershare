@@ -24,10 +24,13 @@ func NewAuthTokenPage(key, email string, OPTError bool) *AuthTokenPage {
 
 func (h *Handlers) Authenticate(w http.ResponseWriter, r *http.Request) {
 	id := r.FormValue("key")
-	rawRecord := mongodb.FindEntityViaUuid(h.collection, id)
+	err, rawRecord := mongodb.FindEntityViaUuid(h.collection, id)
+	if err != nil {
+		h.log.Error(err.Error())
+	}
 
 	record := make(map[string]json.RawMessage)
-	err := json.Unmarshal(rawRecord, &record)
+	err = json.Unmarshal(rawRecord, &record)
 	if err != nil {
 		h.log.Error("failed to unmarshal record", err)
 	}
