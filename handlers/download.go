@@ -22,7 +22,7 @@ func (h *Handlers) Download(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// Handles actually downloading the file onto the device
+// DownloadFile Handles actually downloading the file onto the device
 func (h *Handlers) DownloadFile(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 	jsonData := mongodb.FindEntityViaUuid(h.collection, id)
@@ -72,6 +72,7 @@ func (h *Handlers) DownloadFile(w http.ResponseWriter, r *http.Request) {
 	h.log.Info("ID " + id + " downloaded successfully")
 }
 
+// splitPlainText extracts json from the start of a string and returns it as metadata
 func splitPlainText(plaintext string) (MetaData, string) {
 	// Extract JSON dynamically
 	var metadata MetaData

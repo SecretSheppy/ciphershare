@@ -65,6 +65,7 @@ func (h *Handlers) UploadFile(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/complete/"+uuid, http.StatusSeeOther)
 }
 
+// getFileName creates a random string
 func getFileName() string {
 	return base64.URLEncoding.EncodeToString(cryptography.GenerateKey())
 }
