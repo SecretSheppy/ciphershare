@@ -14,7 +14,13 @@ import (
 
 func (h *Handlers) Download(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	err := h.tpl.ExecuteTemplate(w, "download.gohtml", vars)
+
+	err, _ := mongodb.FindEntityViaUuid(h.collection, vars["id"])
+	if err != nil {
+		h.log.Warn("Invalid download page ID")
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+	}
+	err = h.tpl.ExecuteTemplate(w, "download.gohtml", vars)
 	if err != nil {
 		h.log.Error(err.Error())
 	} else {
@@ -24,10 +30,13 @@ func (h *Handlers) Download(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handlers) DownloadFile(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
-	jsonData := mongodb.FindEntityViaUuid(h.collection, id)
+	err, jsonData := mongodb.FindEntityViaUuid(h.collection, id)
+	if err != nil {
+		h.log.Warn("Invalid download ID attempted post")
+	}
 
 	jsonPointer := make(map[string]json.RawMessage)
-	err := json.Unmarshal(jsonData, &jsonPointer)
+	err = json.Unmarshal(jsonData, &jsonPointer)
 	if err != nil {
 		h.log.Error(err.Error())
 	}
