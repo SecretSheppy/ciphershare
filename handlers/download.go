@@ -39,7 +39,10 @@ func (h *Handlers) Download(w http.ResponseWriter, r *http.Request) {
 // DownloadFile Handles actually downloading the file onto the device
 func (h *Handlers) DownloadFile(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
-	jsonData := mongodb.FindEntityViaUuid(h.collection, id)
+	err, jsonData := mongodb.FindEntityViaUuid(h.collection, id)
+	if err != nil {
+		h.log.Warn("Invalid download ID attempted post")
+	}
 
 	session, _ := h.store.Get(r, "authenticated")
 
@@ -49,7 +52,7 @@ func (h *Handlers) DownloadFile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	jsonPointer := make(map[string]json.RawMessage)
-	err := json.Unmarshal(jsonData, &jsonPointer)
+	err = json.Unmarshal(jsonData, &jsonPointer)
 	if err != nil {
 		h.log.Error(err.Error())
 	}

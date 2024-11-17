@@ -22,11 +22,9 @@ const (
 )
 
 func main() {
-	// the _ is Collection
+	//Connect to the database
 	coll, client := mongodb.Connect()
-	defer func() {
-		mongodb.Disconnect(client)
-	}()
+	defer mongodb.Disconnect(client)
 
 	//Other stuff
 	if err := godotenv.Load(); err != nil {

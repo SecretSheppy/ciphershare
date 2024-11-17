@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"golang-encrypted-filesharing/cryptography"
 	"golang-encrypted-filesharing/mongodb"
+	"golang-encrypted-filesharing/validation"
 	"io"
 	"mime/multipart"
 	"net/http"
@@ -16,12 +17,24 @@ import (
 )
 
 var (
-	_, b, _, _ = runtime.Caller(0)
-	RootPath   = filepath.Join(filepath.Dir(b), "../")
+	_, b, _, _         = runtime.Caller(0)
+	RootPath           = filepath.Join(filepath.Dir(b), "../")
+	errorCodeToMessage = map[string]string{
+		"1": "You haven't given any emails!",
+		"2": "The emails provided weren't valid.",
+		"3": "You haven't uploaded a file!",
+		"4": "There was a problem uploading your file. Please try again.",
+		"5": "There was a problem storing your file. Please try again.",
+	}
 )
 
 func (h *Handlers) Upload(w http.ResponseWriter, r *http.Request) {
-	err := h.tpl.ExecuteTemplate(w, "upload.gohtml", nil)
+	data := struct {
+		Error string
+	}{
+		Error: errorCodeToMessage[r.URL.Query().Get("error")],
+	}
+	err := h.tpl.ExecuteTemplate(w, "upload.gohtml", data)
 	if err != nil {
 		h.log.Error(err.Error())
 	} else {
@@ -36,9 +49,28 @@ func (h *Handlers) UploadFile(w http.ResponseWriter, r *http.Request) {
 	} else {
 		h.log.Info("Form is being parsed")
 	}
+	emailForm := r.FormValue("emails")
+	if emailForm == "" {
+		h.log.Warn("Email is empty")
+		http.Redirect(w, r, "/?error=1", http.StatusSeeOther)
+		return
+	}
+	emailForm = strings.ReplaceAll(emailForm, " ", "")
+	emails := strings.Split(emailForm, ",")
+	for _, email := range emails {
+		if !validation.IsEmailValid(email) {
+			h.log.Warn("Email is not valid")
+			http.Redirect(w, r, "/?error=2", http.StatusSeeOther)
+			return
+		}
+	}
 
 	file, fileHeader, err := r.FormFile("fileUpload")
-	if err != nil {
+	if file == nil {
+		h.log.Warn("File is empty")
+		http.Redirect(w, r, "/?error=3", http.StatusSeeOther)
+		return
+	} else if err != nil {
 		h.log.Error(err.Error())
 	} else {
 		h.log.Info("File is being parsed")
@@ -51,7 +83,14 @@ func (h *Handlers) UploadFile(w http.ResponseWriter, r *http.Request) {
 		h.log.Info("File has been downloaded")
 	}
 
-	uuidJson := mongodb.CreateEntity(h.collection, strings.Split(r.FormValue("emails"), ","), path, key)
+	err, uuidJson := mongodb.CreateEntity(h.collection, emails, path, key)
+	if err != nil {
+		h.log.Error(err.Error())
+		http.Redirect(w, r, "/?error=5", http.StatusSeeOther)
+		return
+	} else {
+		h.log.Info("Entity created")
+	}
 	h.log.Info("File is successfully uploaded")
 
 	jsonPointer := make(map[string]json.RawMessage)
@@ -62,7 +101,19 @@ func (h *Handlers) UploadFile(w http.ResponseWriter, r *http.Request) {
 	uuid := string(jsonPointer["InsertedID"])
 	uuid = uuid[1 : len(uuid)-1]
 
-	http.Redirect(w, r, "/complete/"+uuid, http.StatusSeeOther)
+	data := struct {
+		Id     string
+		Domain string
+	}{
+		Id:     uuid,
+		Domain: os.Getenv("DOMAIN"),
+	}
+	err = h.tpl.ExecuteTemplate(w, "complete.gohtml", data)
+	if err != nil {
+		h.log.Error(err.Error())
+	} else {
+		h.log.Info("Upload completion page accessed")
+	}
 }
 
 // getFileName creates a random string
@@ -105,10 +156,7 @@ func saveFile(file multipart.File, fileHeader *multipart.FileHeader, filename st
 
 	key, encryptedFileBytes := cryptography.Encrypt(fileBytes)
 
-	if err != nil {
-		return "", "", err
-	}
-	tempFile.Write(encryptedFileBytes)
+	_, err = tempFile.Write(encryptedFileBytes)
 
 	return key, filepath.Clean("files/" + filename), nil
 }
