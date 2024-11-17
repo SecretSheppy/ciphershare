@@ -9,14 +9,16 @@ import (
 )
 
 type AuthTokenPage struct {
-	Key   string
-	Email string
+	Key      string
+	Email    string
+	OTPError bool
 }
 
-func NewAuthTokenPage(key, email string) *AuthTokenPage {
+func NewAuthTokenPage(key, email string, OPTError bool) *AuthTokenPage {
 	return &AuthTokenPage{
-		Key:   key,
-		Email: email,
+		Key:      key,
+		Email:    email,
+		OTPError: OPTError,
 	}
 }
 
@@ -38,7 +40,7 @@ func (h *Handlers) Authenticate(w http.ResponseWriter, r *http.Request) {
 
 	if utils.StringInList(r.FormValue("email"), emails) {
 		h.auth.SendVerificationEmail(r.FormValue("email"))
-		template := NewAuthTokenPage(id, r.FormValue("email"))
+		template := NewAuthTokenPage(id, r.FormValue("email"), false)
 		err = h.tpl.ExecuteTemplate(w, "auth0_token_authentication.gohtml", template)
 		if err != nil {
 			h.log.Error("failed to execute template", err)
@@ -54,18 +56,17 @@ func (h *Handlers) Authenticate(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handlers) AuthToken(w http.ResponseWriter, r *http.Request) {
-	// TODO: take the input code and send it to auth0 api. if a 200 comes back
-	//  then the user is authenticated, else show email page with error
-	// TODO: must set logged in cookie
-	// TODO: must set uuid in the cookie
 	email := r.FormValue("email")
 	id := r.FormValue("key")
 	otp := r.FormValue("otp")
 
 	err := h.auth.ValidateOauthToken(email, otp)
 	if err != nil {
-		h.log.Error("failed to validate token", err)
-		http.Redirect(w, r, "/files/"+id, http.StatusUnauthorized)
+		template := NewAuthTokenPage(id, email, true)
+		err = h.tpl.ExecuteTemplate(w, "auth0_token_authentication.gohtml", template)
+		if err != nil {
+			h.log.Error("failed to execute template", err)
+		}
 		return
 	}
 

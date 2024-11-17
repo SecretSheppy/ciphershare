@@ -38,6 +38,9 @@
         <div class="form-section-wrapper">
             <label for="otp" class="generic-form-label required">One Time Password</label>
             <input class="generic-form-input" id="otp" name="otp" placeholder="Enter One Time Password">
+            {{ if .OTPError }}
+                <p>One Time Password was incorrect</p>
+            {{ end }}
         </div>
         <button class="submit-button" type="submit">Send One Time Password</button>
     </form>
