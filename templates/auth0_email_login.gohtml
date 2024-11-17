@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="preload" as="style" onload="this.rel = 'stylesheet'" href="/static/style/style.css">
+    <noscript>
+        <link rel="stylesheet" href="/static/style/style.css" />
+    </noscript>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="title" content="Upload Completed - CipherShare">
+    <meta name="description" content="Upload a file and share it with friends knowing its safely stored as an encrypted blob on our servers">
+    <meta name="dcterms.rightsHolder" content="CipherShare">
+    <meta name="dcterms.dateCopyrighted" content="2024">
+    <meta name="robots" content="noindex">
+    <meta name="googlebot" content="noindex">
+    <meta name="bingbot" content="noindex">
+    <meta name="theme-color" content="#ffffff">
+    <title>Upload Completed - CipherShare</title>
+    <script src="https://code.jquery.com/jquery-4.0.0-beta.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
+    <script src="/static/js/clipboard-copy.js"></script>
+    <link rel="icon" type="image/x-icon" href="/static/gfx/branding/favicon.webp">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" as="style" onload="this.rel = 'stylesheet'" href="https://fonts.googleapis.com/css2?family=Mona+Sans:ital,wght@0,200..900;1,200..900&display=swap">
+    <noscript>
+        <link href="https://fonts.googleapis.com/css2?family=Mona+Sans:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">
+    </noscript>
+</head>
+<body>
+<div class="main-content-wrapper">
+    <div class="title-image-wrapper">
+        <img class="title-image" src="/static/gfx/branding/logo.webp" alt="CipherShare - Logo" />
+    </div>
+    <form class="generic-form" action="/auth" method="POST" enctype="application/x-www-form-urlencoded">
+        <input type="hidden" name="key" value="{{ .Key }}">
+        <div class="form-section-wrapper">
+            <label for="email" class="generic-form-label required">Email</label>
+            <p class="label-description">You must enter your email to receive a one time password in order to download this file.</p>
+            <input class="generic-form-input" id="email" name="email" placeholder="email@example.com">
+            {{ if .EmailError }}
+                <p>The entered email does not have access to this document</p>
+            {{ end }}
+        </div>
+        <button class="submit-button" type="submit">Send One Time Password</button>
+    </form>
+</div>
+</body>
+</html>

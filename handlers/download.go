@@ -6,6 +6,7 @@ import (
 	"github.com/gorilla/mux"
 	"golang-encrypted-filesharing/cryptography"
 	"golang-encrypted-filesharing/mongodb"
+	"golang-encrypted-filesharing/templates"
 	"io"
 	"mime"
 	"net/http"
@@ -14,18 +15,38 @@ import (
 
 func (h *Handlers) Download(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
+
+	session, _ := h.store.Get(r, "authenticated")
+
+	if session.Values["id"] != vars["key"] {
+		template := templates.NewAuth0EmailLogin(vars["key"], false)
+		err := h.tpl.ExecuteTemplate(w, "auth0_email_login.gohtml", template)
+		if err != nil {
+			h.log.Error("failed to execute template: ", err)
+		}
+		return
+	}
+
 	err := h.tpl.ExecuteTemplate(w, "download.gohtml", vars)
 	if err != nil {
 		h.log.Error(err.Error())
-	} else {
-		h.log.Info("ID " + vars["key"] + " download page accessed")
+		return
 	}
+
+	h.log.Info("ID " + vars["key"] + " download page accessed")
 }
 
 // DownloadFile Handles actually downloading the file onto the device
 func (h *Handlers) DownloadFile(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 	jsonData := mongodb.FindEntityViaUuid(h.collection, id)
+
+	session, _ := h.store.Get(r, "authenticated")
+
+	if session.Values["id"] != id {
+		http.Redirect(w, r, "/", http.StatusFound)
+		return
+	}
 
 	jsonPointer := make(map[string]json.RawMessage)
 	err := json.Unmarshal(jsonData, &jsonPointer)

@@ -1,6 +1,8 @@
 module golang-encrypted-filesharing
 
-go 1.22
+go 1.23
+
+toolchain go1.23.3
 
 require (
 	github.com/go-resty/resty/v2 v2.16.0
@@ -12,6 +14,8 @@ require (
 
 require (
 	github.com/golang/snappy v0.0.4 // indirect
+	github.com/gorilla/securecookie v1.1.2 // indirect
+	github.com/gorilla/sessions v1.4.0 // indirect
 	github.com/klauspost/compress v1.13.6 // indirect
 	github.com/montanaflynn/stats v0.7.1 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
