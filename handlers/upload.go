@@ -22,7 +22,13 @@ var (
 )
 
 func (h *Handlers) Upload(w http.ResponseWriter, r *http.Request) {
-	err := h.tpl.ExecuteTemplate(w, "upload.gohtml", nil)
+	data := struct {
+		Error string
+	}{
+		Error: r.URL.Query().Get("error"),
+	}
+	fmt.Println(r.URL.Query().Get("error"))
+	err := h.tpl.ExecuteTemplate(w, "upload.gohtml", data)
 	if err != nil {
 		h.log.Error(err.Error())
 	} else {
@@ -41,21 +47,24 @@ func (h *Handlers) UploadFile(w http.ResponseWriter, r *http.Request) {
 	if emailForm == "" {
 		h.log.Warn("Email is empty")
 		http.Redirect(w, r, "/?error=1", http.StatusSeeOther)
+		return
 	}
 	emails := strings.Split(emailForm, ",")
 	for _, email := range emails {
 		if !validation.IsEmailValid(email) {
 			h.log.Warn("Email is not valid")
 			http.Redirect(w, r, "/?error=2", http.StatusSeeOther)
+			return
 		}
 	}
 
 	file, fileHeader, err := r.FormFile("fileUpload")
-	if err != nil {
-		h.log.Error(err.Error())
-	} else if file == nil {
+	if file == nil {
 		h.log.Warn("File is empty")
 		http.Redirect(w, r, "/?error=3", http.StatusSeeOther)
+		return
+	} else if err != nil {
+		h.log.Error(err.Error())
 	} else {
 		h.log.Info("File is being parsed")
 	}

@@ -50,6 +50,11 @@
         </div>
         <button class="submit-button" type="submit">Save and Upload</button>
     </form>
+    <h3>
+        {{ if .Error}}
+            ERROR: {{.Error}}
+        {{ end }}
+    </h3>
 </div>
 </body>
 </html>
